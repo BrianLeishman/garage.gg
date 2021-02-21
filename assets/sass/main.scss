@@ -9,6 +9,19 @@ $headings-font-family: "AXIS Extra Bold";
 
 @import "../node_modules/bootstrap/scss/bootstrap";
 
+html, body {
+    min-height: 100vh;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+#main {
+    flex: 1;
+}
+
 label[disabled], a[disabled] {
     opacity: .65;
     pointer-events: none;

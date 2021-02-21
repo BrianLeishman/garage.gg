@@ -3,6 +3,7 @@ languageCode = "en-us"
 title = "Very Good Garage"
 
 [params]
+  description = "The official site and store for Very Good Garage"
   email = "help@garage.gg"
   youtube = "https://www.youtube.com/channel/UCP8kFvowOZaoIiTKlWPKSzA"
   facebook = "https://www.facebook.com/VeryGoodGarage"
