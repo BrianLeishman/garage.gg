@@ -1,3 +1,9 @@
 baseURL = "https://garage.gg/"
 languageCode = "en-us"
 title = "Very Good Garage"
+
+[params]
+  email = "help@garage.gg"
+  youtube = "https://www.youtube.com/channel/UCP8kFvowOZaoIiTKlWPKSzA"
+  facebook = "https://www.facebook.com/VeryGoodGarage"
+  instagram = "https://www.instagram.com/brianleishman"
