@@ -5,9 +5,34 @@ $link-decoration: none;
 
 $border-radius: 0.5rem;
 
+$headings-font-family: "AXIS Extra Bold";
+
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 label[disabled], a[disabled] {
     opacity: .65;
     pointer-events: none;
+}
+
+@font-face {
+    font-family: 'AXIS Extra Bold';
+    src: url('/fonts/axis_extra_bold_800-webfont.woff2') format('woff2'),
+         url('/fonts/axis_extra_bold_800-webfont.woff') format('woff');
+    font-weight: 800;
+    font-style: normal;
+
+}
+
+.bg-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+.bg-secondary-90 {
+    background-color: rgba($secondary, .9);
 }
