@@ -39,5 +39,15 @@
             crossorigin="anonymous"></script>{{range .Params.js}}
         <script src="{{.}}"></script>{{end}}
 
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-J6G1HMN57E"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-J6G1HMN57E');
+        </script>
+
     </body>
 </html>
