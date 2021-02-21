@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="h-100">
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
@@ -10,6 +10,7 @@
     <link href=https://use.fontawesome.com/releases/v5.13.1/css/all.css rel=stylesheet>
 
     <title>{{ block "title" . }}{{ .Site.Title }}{{ end }}</title>
+    <meta name="description" content="{{ .Params.description }}" />
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -20,7 +21,7 @@
     <meta name="theme-color" content="#3b4a6b">
 </head>
 
-<body class="d-flex flex-column h-100">
+<body>
     <header class="site-header sticky-top">
         <!-- <div class="bg-primary text-white py-2 small text-center">
             Orders over $100 get free shipping!
@@ -64,13 +65,13 @@
         </nav>
     </header>
 
-    <div class="flex-grow-1">
+    <main id="main">
         {{ block "main" . }}
         <!-- The part of the page that begins to differ between templates -->
         {{ end }}
-    </div>
+    </main>
 
-    <footer class="bg-secondary mt-5">
+    <footer id="footer" class="bg-secondary mt-5">
         <div class="py-5 border-bottom border-primary">
             <div class="container">
                 <div class="row">
