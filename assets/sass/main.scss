@@ -5,7 +5,7 @@ $link-decoration: none;
 
 $border-radius: 0.5rem;
 
-@import "../node_modules/bootstrap-5/scss/bootstrap";
+@import "../node_modules/bootstrap/scss/bootstrap";
 
 label[disabled], a[disabled] {
     opacity: .65;
