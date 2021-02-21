@@ -1,0 +1,44 @@
+name: deploy
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: checkout master
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: hugo build
+        uses: jakejarvis/hugo-build-action@master
+        with:
+          args: --minify
+
+      - name: check for changes
+        id: changes
+        uses: UnicornGlobal/has-changes-action@v1.0.11
+
+      - name: commit changes
+        if: steps.changes.outputs.changed == 1
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git commit -am "generated"
+          git push
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: upload zip to s3
+        run: aws s3 sync public s3://garage.gg --delete --acl public-read

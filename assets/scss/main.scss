@@ -1,0 +1,13 @@
+$primary: #3b4a6b;
+$secondary: #f0d43a;
+
+$link-decoration: none;
+
+$border-radius: 0.5rem;
+
+@import "../node_modules/bootstrap-5/scss/bootstrap";
+
+label[disabled], a[disabled] {
+    opacity: .65;
+    pointer-events: none;
+}
