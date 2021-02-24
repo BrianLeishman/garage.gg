@@ -21,19 +21,6 @@ jobs:
         with:
           args: --minify
 
-      - name: check for changes
-        id: changes
-        uses: UnicornGlobal/has-changes-action@v1.0.11
-
-      - name: commit changes
-        if: steps.changes.outputs.changed == 1
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add -A
-          git commit -m "generated"
-          git push
-
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
