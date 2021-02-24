@@ -41,7 +41,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: upload zip to s3
+      - name: sync public with s3
         run: aws s3 sync public s3://garage.gg --delete --acl public-read
 
       - name: invalidate cloudfront
