@@ -29,7 +29,7 @@ jobs:
           aws-region: us-east-1
 
       - name: sync public with s3
-        run: aws s3 sync public s3://garage.gg --delete --acl public-read
+        run: aws s3 sync public s3://{{ secrets.BUCKET }} --delete --acl public-read
 
       - name: invalidate cloudfront
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.DISTRIBUTION_ID }} --paths '/*'
