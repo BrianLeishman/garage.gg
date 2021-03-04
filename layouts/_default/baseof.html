@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    {{ $style := resources.Get "sass/main.scss" | toCSS | fingerprint }}
+    {{ $style := resources.Get "sass/main.scss" | toCSS | minify | fingerprint }}
     <link rel="stylesheet" href="{{ $style.Permalink }}">
     <link href=https://use.fontawesome.com/releases/v5.13.1/css/all.css rel=stylesheet>
 
@@ -202,7 +202,7 @@
     </footer>
 
     <script src="https://polyfill.io/v3/polyfill.js?features=es5,es6,es7&flags=gated"></script>
-    {{ $js := resources.Get "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js" | fingerprint}}
+    {{ $js := resources.Get "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js" | minify | fingerprint}}
     <script src="{{ $js.Permalink }}"></script>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
