@@ -1,0 +1,47 @@
+name: admin-api
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '**'
+      - '!.github/workflows/**'
+      - '.github/workflows/admin-api.yml'
+      - '!assets/go/lambda/**'
+      - 'assets/go/lambda/admin-api/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: checkout master
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: setup go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'
+
+      - name: go build
+        working-directory: assets/go/lambda/admin-api
+        run: go build
+
+      - name: zip function
+        working-directory: assets/go/lambda/admin-api
+        run: zip -r admin-api.zip .
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: deploy lambda
+        working-directory: assets/go/lambda/admin-api
+        run: aws lambda update-function-code --function-name adminAPI --zip-file fileb://admin-api.zip

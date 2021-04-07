@@ -22,7 +22,7 @@
 </head>
 
 <body>
-    <header class="site-header sticky-top">
+    <header class="site-header sticky-top shadow-sm">
         <!-- <div class="bg-primary text-white py-2 small text-center">
             Orders over $100 get free shipping!
         </div> -->
@@ -202,7 +202,29 @@
     </footer>
 
     <script src="https://polyfill.io/v3/polyfill.js?features=es5,es6,es7&flags=gated"></script>
-    {{ $js := resources.Get "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js" | minify | fingerprint}}
+    <script>var axios, intlTelInput, Ladda;</script>
+
+    {{ $js := resources.Get "node_modules/bootstrap-5/dist/js/bootstrap.bundle.min.js" | fingerprint }}
+    <script src="{{ $js.Permalink }}"></script>
+
+    {{ range .Params.js }}
+    <script src="{{ index $.Site.Params.js . }}"></script>{{ end }}
+
+    {{ $envParams := index .Site.Params "prod" }}
+
+    {{- if .Site.IsServer -}}
+        {{ $envParams = index .Site.Params "dev" }}
+    {{- end -}}
+
+    <script>
+    if (axios) {
+        axios.defaults.baseURL = {{ $envParams.apiRoot }};
+        axios.defaults.paramsSerializer = function (params) {
+            return Qs.stringify(params, { arrayFormat: "repeat" });
+        };
+    }
+    </script>
+    {{ $js := resources.Get "js/app.js" | fingerprint }}
     <script src="{{ $js.Permalink }}"></script>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->

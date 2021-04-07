@@ -2,9 +2,39 @@ baseURL = "https://garage.gg/"
 languageCode = "en-us"
 title = "Very Good Garage"
 
+[minify]
+  [minify.tdewolff]
+    [minify.tdewolff.html]
+      keepConditionalComments = true
+      keepDocumentTags = true
+      keepEndTags = false
+      keepWhitespace = true
+
 [params]
   description = "The official site and store for Very Good Garage"
   email = "help@garage.gg"
   youtube = "https://www.youtube.com/channel/UCP8kFvowOZaoIiTKlWPKSzA"
   facebook = "https://www.facebook.com/VeryGoodGarage"
   instagram = "https://www.instagram.com/brianleishman"
+
+  [params.dev]
+        apiRoot = "http://localhost:8085"
+    [params.prod]
+        apiRoot = "https://admin-api.garage.gg.com"
+    [params.css]
+        intlTelInput = "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.min.css"
+        toast = "https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.css"
+        ladda = "https://cdnjs.cloudflare.com/ajax/libs/Ladda/1.0.6/ladda-themeless.min.css"
+        fancybox = "https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css"
+    [params.js]
+        jquery = "https://code.jquery.com/jquery-3.6.0.min.js"
+        swal = "https://cdn.jsdelivr.net/npm/sweetalert2@10"
+        laddaSpin = "https://cdnjs.cloudflare.com/ajax/libs/Ladda/1.0.6/spin.min.js"
+        ladda = "https://cdnjs.cloudflare.com/ajax/libs/Ladda/1.0.6/ladda.min.js"
+        intlTelInput = "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"
+        toast = "https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
+        big = "https://cdn.jsdelivr.net/npm/big.js@6.0.0/big.min.js"
+        luxon = "https://cdnjs.cloudflare.com/ajax/libs/luxon/1.25.0/luxon.min.js"
+        axios = "https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"
+        fancybox = "https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"
+        qs = "https://cdnjs.cloudflare.com/ajax/libs/qs/6.10.1/qs.min.js"

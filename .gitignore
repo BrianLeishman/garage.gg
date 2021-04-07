@@ -1,1 +1,4 @@
 public/
+assets/go/lambda/admin-api/.env
+assets/node_modules
+assets/go/lambda/admin-api/admin-api
