@@ -43,4 +43,4 @@ jobs:
 
       - name: deploy lambda
         working-directory: assets/go/lambda/admin-api
-        run: aws lambda update-function-code --function-name adminAPI --zip-file fileb://admin-api.zip
+        run: aws lambda update-function-code --function-name vggAdminAPI --zip-file fileb://admin-api.zip
