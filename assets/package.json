@@ -11,5 +11,8 @@
     "url": "github.com/BrianLeishman/garage.gg"
   },
   "author": "Brian Leishman",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.0.0-beta3"
+  }
 }
