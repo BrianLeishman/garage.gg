@@ -1,5 +1,6 @@
 public/
 .env
 node_modules/
+_gen/
 assets/go/lambda/admin-api/admin-api
 assets/go/lambda/api/api

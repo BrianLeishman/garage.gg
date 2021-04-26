@@ -16,6 +16,8 @@ title = "Very Good Garage"
   youtube = "https://www.youtube.com/channel/UCP8kFvowOZaoIiTKlWPKSzA"
   facebook = "https://www.facebook.com/VeryGoodGarage"
   instagram = "https://www.instagram.com/brianleishman"
+  discord = "https://discord.gg/CnHJJmfpuH"
+  reddit = "https://reddit.com/r/verygoodgarage"
 
   [params.dev]
         apiRoot = "http://localhost:8085"

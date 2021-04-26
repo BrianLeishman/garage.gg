@@ -7,6 +7,11 @@ $border-radius: 0.5rem;
 
 $headings-font-family: "AXIS Extra Bold";
 
+$enable-rounded: false;
+
+$input-btn-padding-y-lg:      .5rem !default;
+$input-btn-padding-x-lg:      3rem !default;
+
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 html, body {
@@ -48,4 +53,15 @@ label[disabled], a[disabled] {
 
 .bg-secondary-90 {
     background-color: rgba($secondary, .9);
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+    -moz-appearance:textfield; /* Firefox */
 }
