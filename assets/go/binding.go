@@ -88,7 +88,7 @@ func (v *Validator) Engine() interface{} {
 }
 
 var rawBase64URLRegex = regexp.MustCompile("^[A-Za-z0-9-_]*$")
-var xidRegex = regexp.MustCompile("[0-9a-v]{20}$")
+var xidRegex = regexp.MustCompile("^[0-9a-v]{20}$")
 
 func (v *Validator) lazyinit() {
 	v.once.Do(func() {

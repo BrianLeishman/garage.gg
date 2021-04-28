@@ -51,6 +51,10 @@ func _init() bool {
 		})
 	}
 
+	r.Use(gin.BasicAuth(gin.Accounts{
+		os.Getenv("BASIC_AUTH_USER"): os.Getenv("BASIC_AUTH_PASS"),
+	}))
+
 	return false
 }
 

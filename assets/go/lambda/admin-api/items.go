@@ -3,17 +3,10 @@ package main
 import (
 	"bytes"
 	"net/http"
-	"os"
 	"path/filepath"
-	"time"
 
 	vgg "github.com/BrianLeishman/garage.gg/assets/go"
 	"github.com/gin-gonic/gin"
-	"github.com/go-git/go-billy/v5/memfs"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing/object"
-	transport "github.com/go-git/go-git/v5/plumbing/transport/http"
-	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
 	"gopkg.in/yaml.v2"
@@ -21,14 +14,15 @@ import (
 
 func init() {
 	r.POST("/items", hItemCreate)
-	// r.PATCH("/users/:user/verify", hUserVerify)
-	// r.GET("/users/:user", hUserGet)
+	r.GET("/items", hItemsGet)
+	r.GET("/items/:itemID", hItemGet)
+	r.DELETE("/items/:itemID", hItemDelete)
 }
 
 type Item struct {
-	ID          string   `dynamo:"pk" json:"id" yaml:"-" binding:"omitempty,startswith=item_,xid,len=25" mod:"trim"`
-	Group       string   `dynamo:"sk" json:"group" yaml:"-" binding:"required,max=255" mod:"trim"`
-	Name        string   `dynamo:"name" json:"name" yaml:"title" binding:"required,max=255" mod:"trim"`
+	ID          string   `dynamo:"pk" json:"id" yaml:"-" binding:"omitempty,startswith=xid" mod:"trim"`
+	SortKey     string   `dynamo:"sk" json:"-" yaml:"-" binding:"-"`
+	Name        string   `dynamo:"data" json:"name" yaml:"title" binding:"required,max=255" mod:"trim"`
 	Description string   `dynamo:"desc" json:"description" yaml:"description" binding:"required,max=1024" mod:"trim"`
 	Price       float64  `dynamo:"price" json:"price" yaml:"price" binding:"required,gt=0"`
 	Sizes       []string `dynamo:"sizes" json:"sizes" yaml:"sizes" binding:"required"`
@@ -39,7 +33,15 @@ type Item struct {
 	Categories  []string `dynamo:"categories" json:"categories" yaml:"categories" binding:"required" mod:"trim"`
 }
 
-func (i *Item) Markdown() []byte {
+func (i *Item) filepath() string {
+	return filepath.Join("content", "shop")
+}
+
+func (i *Item) filename() string {
+	return i.ID + ".md"
+}
+
+func (i *Item) markdown() []byte {
 	buf := new(bytes.Buffer)
 	buf.WriteString(`---
 #*****************************************************************************
@@ -57,71 +59,6 @@ func (i *Item) Markdown() []byte {
 	return buf.Bytes()
 }
 
-func commitItem(item Item) error {
-	fs := memfs.New()
-
-	r, err := git.Clone(memory.NewStorage(), fs, &git.CloneOptions{
-		URL:   os.Getenv("REPO"),
-		Depth: 1,
-	})
-	if err != nil {
-		return errors.Wrapf(err, "failed to clone repo to memory")
-	}
-
-	w, err := r.Worktree()
-	if err != nil {
-		return errors.Wrapf(err, "failed to get worktree")
-	}
-
-	dir := filepath.Join("content", "shop")
-	err = fs.MkdirAll(dir, os.ModePerm)
-	if err != nil {
-		return errors.Wrapf(err, "failed to create shop dir")
-	}
-
-	filename := filepath.Join(dir, item.ID+".md")
-	f, err := fs.Create(filename)
-	if err != nil {
-		return errors.Wrapf(err, "failed to create new shop item file in memory")
-	}
-
-	_, err = f.Write(item.Markdown())
-	if err != nil {
-		return errors.Wrapf(err, "failed to write new shop item file in memory")
-	}
-
-	_, err = w.Add(filename)
-	if err != nil {
-		return errors.Wrapf(err, "failed to git-add new item file")
-	}
-
-	_, err = w.Commit(item.ID, &git.CommitOptions{
-		Author: &object.Signature{
-			Name:  "Admin API",
-			Email: "brian@garage.gg",
-			When:  time.Now(),
-		},
-	})
-	if err != nil {
-		return errors.Wrapf(err, "failed to commit new item file")
-	}
-
-	auth := &transport.BasicAuth{
-		Username: os.Getenv("GH_USER"),
-		Password: os.Getenv("GH_PAT"),
-	}
-
-	err = r.Push(&git.PushOptions{
-		RemoteName: "origin",
-		Auth:       auth,
-	})
-	if err != nil {
-		return errors.Wrapf(err, "failed to push new item file")
-	}
-
-	return nil
-}
-
 func hItemCreate(c *gin.Context) {
 	var req struct {
 		Item
@@ -130,21 +67,63 @@ func hItemCreate(c *gin.Context) {
 		return
 	}
 
-	req.Item.ID = "item_" + xid.New().String()
+	req.Item.ID = xid.New().String()
+	req.Item.SortKey = "ITEM"
 
-	err := table.Put(req.Item).Run()
+	err := table.Put(req.Item).If("attribute_not_exists('sk')").If("attribute_not_exists('data')").Run()
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, errors.Wrapf(err, "failed to insert item"))
 		return
 	}
 
-	err = commitItem(req.Item)
+	err = commit(&req.Item)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, errors.Wrapf(err, "failed to create item in rpeo"))
+		c.AbortWithError(http.StatusInternalServerError, errors.Wrapf(err, "failed to commit item"))
 		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
 		"id": req.Item.ID,
 	})
+}
+
+func hItemsGet(c *gin.Context) {
+	var items []Item
+	err := table.Get("sk", "ITEM").Index("sk-data-index").All(&items)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, errors.Wrapf(err, "failed to get items"))
+		return
+	}
+
+	if items == nil {
+		items = make([]Item, 0)
+	}
+
+	c.JSON(http.StatusOK, items)
+}
+
+func hItemGet(c *gin.Context) {
+	var items []Item
+	err := table.Get("pk", c.Param("itemID")).Limit(1).All(&items)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, errors.Wrapf(err, "failed to get item"))
+		return
+	}
+
+	if len(items) == 0 {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	c.JSON(http.StatusOK, items[0])
+}
+
+func hItemDelete(c *gin.Context) {
+	err := table.Delete("pk", c.Param("itemID")).Range("sk", "ITEM").Run()
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, errors.Wrapf(err, "failed to delete item"))
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }
