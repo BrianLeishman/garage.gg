@@ -33,6 +33,20 @@ type Item struct {
 	Categories  []string `dynamo:"categories" json:"categories" yaml:"categories" binding:"required" mod:"trim"`
 }
 
+func (i *Item) name() unique {
+	return unique{
+		PK: "item#name",
+		SK: i.Name,
+	}
+}
+
+func (i *Item) slug() unique {
+	return unique{
+		PK: "item#slug",
+		SK: i.Slug,
+	}
+}
+
 func (i *Item) filepath() string {
 	return filepath.Join("content", "shop")
 }
@@ -70,7 +84,13 @@ func hItemCreate(c *gin.Context) {
 	req.Item.ID = xid.New().String()
 	req.Item.SortKey = "ITEM"
 
-	err := table.Put(req.Item).If("attribute_not_exists('sk')").If("attribute_not_exists('data')").Run()
+	tx := db.WriteTx()
+	tx.Idempotent(true)
+	tx.Put(table.Put(req.Item))
+	tx.Put(table.Put(req.name()).If("attribute_not_exists(pk)").If("attribute_not_exists(sk)"))
+	tx.Put(table.Put(req.slug()).If("attribute_not_exists(pk)").If("attribute_not_exists(sk)"))
+
+	err := tx.Run()
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, errors.Wrapf(err, "failed to insert item"))
 		return

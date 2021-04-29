@@ -66,6 +66,12 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 	return ginLambda.ProxyWithContext(ctx, req)
 }
 
+type unique struct {
+	PK string `dynamo:"pk"`
+	SK string `dynamo:"sk"`
+}
+
+var db *dynamo.DB
 var table dynamo.Table
 
 func main() {
@@ -74,7 +80,7 @@ func main() {
 		panic(err)
 	}
 
-	db := dynamo.New(sess)
+	db = dynamo.New(sess)
 	table = db.Table("vgg")
 
 	binding.Validator = &vgg.Validator{}
