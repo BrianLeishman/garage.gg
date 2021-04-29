@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/memfs"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
@@ -19,20 +20,31 @@ type committer interface {
 	markdown() []byte
 }
 
-func commit(c committer) error {
-	fs := memfs.New()
+func clone() (fs billy.Filesystem, r *git.Repository, w *git.Worktree, err error) {
+	fs = memfs.New()
 
-	r, err := git.Clone(memory.NewStorage(), fs, &git.CloneOptions{
+	r, err = git.Clone(memory.NewStorage(), fs, &git.CloneOptions{
 		URL:   os.Getenv("REPO"),
 		Depth: 1,
 	})
 	if err != nil {
-		return errors.Wrapf(err, "failed to clone repo to memory")
+		err = errors.Wrapf(err, "failed to clone repo to memory")
+		return
 	}
 
-	w, err := r.Worktree()
+	w, err = r.Worktree()
 	if err != nil {
-		return errors.Wrapf(err, "failed to get worktree")
+		err = errors.Wrapf(err, "failed to get worktree")
+		return
+	}
+
+	return
+}
+
+func commit(c committer) error {
+	fs, r, w, err := clone()
+	if err != nil {
+		return err
 	}
 
 	dir := c.filepath()
@@ -52,7 +64,30 @@ func commit(c committer) error {
 		return errors.Wrapf(err, "failed to write file in memory")
 	}
 
-	_, err = w.Add(filename)
+	return push(filename, r, w)
+}
+
+func delete(c committer) error {
+	fs, r, w, err := clone()
+	if err != nil {
+		return err
+	}
+
+	dir := c.filepath()
+
+	filename := filepath.Join(dir, c.filename())
+	fs.Remove(filename)
+
+	return push(filename, r, w)
+}
+
+func push(filename string, r *git.Repository, w *git.Worktree) error {
+	s, _ := w.Status()
+	if s.IsClean() {
+		return nil
+	}
+
+	_, err := w.Add(filename)
 	if err != nil {
 		return errors.Wrapf(err, "failed to git-add new file")
 	}

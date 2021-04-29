@@ -45,3 +45,7 @@ func BindJSON(c *gin.Context, dest interface{}) (ok bool) {
 func BindQuery(c *gin.Context, dest interface{}) (ok bool) {
 	return handleBindErrors(c, c.ShouldBindQuery(dest))
 }
+
+func BindURI(c *gin.Context, dest interface{}) (ok bool) {
+	return handleBindErrors(c, c.ShouldBindUri(dest))
+}

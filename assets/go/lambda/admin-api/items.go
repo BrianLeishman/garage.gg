@@ -20,7 +20,7 @@ func init() {
 }
 
 type Item struct {
-	ID          string   `dynamo:"pk" json:"id" yaml:"-" binding:"omitempty,startswith=xid" mod:"trim"`
+	ID          string   `dynamo:"pk" json:"id" yaml:"-" binding:"omitempty,xid"`
 	SortKey     string   `dynamo:"sk" json:"-" yaml:"-" binding:"-"`
 	Name        string   `dynamo:"data" json:"name" yaml:"title" binding:"required,max=255" mod:"trim"`
 	Description string   `dynamo:"desc" json:"description" yaml:"description" binding:"required,max=1024" mod:"trim"`
@@ -103,8 +103,15 @@ func hItemsGet(c *gin.Context) {
 }
 
 func hItemGet(c *gin.Context) {
+	var req struct {
+		ID string `uri:"itemID" binding:"xid"`
+	}
+	if !vgg.BindURI(c, &req) {
+		return
+	}
+
 	var items []Item
-	err := table.Get("pk", c.Param("itemID")).Limit(1).All(&items)
+	err := table.Get("pk", req.ID).Limit(1).All(&items)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, errors.Wrapf(err, "failed to get item"))
 		return
@@ -119,9 +126,22 @@ func hItemGet(c *gin.Context) {
 }
 
 func hItemDelete(c *gin.Context) {
-	err := table.Delete("pk", c.Param("itemID")).Range("sk", "ITEM").Run()
+	var req struct {
+		ID string `uri:"itemID" binding:"xid"`
+	}
+	if !vgg.BindURI(c, &req) {
+		return
+	}
+
+	err := table.Delete("pk", req.ID).Range("sk", "ITEM").Run()
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, errors.Wrapf(err, "failed to delete item"))
+		return
+	}
+
+	err = delete(&Item{ID: req.ID})
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, errors.Wrapf(err, "failed to delete item from repo"))
 		return
 	}
 
