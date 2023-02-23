@@ -25,7 +25,7 @@ require (
 	github.com/rs/xid v1.3.0
 	github.com/shopspring/decimal v1.2.0
 	github.com/ugorji/go v1.2.4 // indirect
-	golang.org/x/text v0.3.5 // indirect
+	golang.org/x/text v0.3.8 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
