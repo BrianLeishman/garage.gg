@@ -13,11 +13,10 @@ require (
 	github.com/go-git/go-git/v5 v5.3.0
 	github.com/go-playground/mold/v4 v4.0.0
 	github.com/go-playground/validator/v10 v10.19.0
-	github.com/golang/protobuf v1.5.1 // indirect
 	github.com/guregu/dynamo v1.10.4
 	github.com/iancoleman/strcase v0.1.3
 	github.com/joho/godotenv v1.3.0
-	github.com/nyaruka/phonenumbers v1.0.68
+	github.com/nyaruka/phonenumbers v1.2.2
 	github.com/onsi/ginkgo v1.15.2 // indirect
 	github.com/onsi/gomega v1.11.0 // indirect
 	github.com/pkg/errors v0.9.1
