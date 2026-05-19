@@ -10,7 +10,7 @@ require (
 	github.com/gin-contrib/cors v1.6.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-git/go-billy/v5 v5.9.0
-	github.com/go-git/go-git/v5 v5.19.0
+	github.com/go-git/go-git/v5 v5.19.1
 	github.com/go-playground/mold/v4 v4.0.0
 	github.com/go-playground/validator/v10 v10.19.0
 	github.com/guregu/dynamo v1.10.4
